@@ -1,7 +1,8 @@
 # r2d2_sim
 Octave script showing platoon maneuvering around Remote Radio Detection Devices (R2D2s) from (0,0) to the maximal (x,y) point.
 
- Basic Instructions:
+## Basic Instructions:
+
    Run in Octave.  Opens up a split GUI figure with battlespace on top and
    platoon detection time values along the bottom.  Platoon automatically starts 
    from (1,1), and goes until it finishes at (1000,1000).
