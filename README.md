@@ -6,7 +6,10 @@ Octave script showing platoon maneuvering around Remote Radio Detection Devices 
 ### jyn_prompt2_battlespace.pptx
 MS Powerpoint presentation detailing the plan to utilize a computer simulation (r2d2_sim.m) to simulate the maneuvering of Platoon through battlespace to avoid detection from the R2D2s.
 
-# r2d2.sim Basic Instructions:
+# r2d2_sim_matlab.m:
+Converted to work in Matlab (untested).
+
+# r2d2_sim.m Basic Instructions:
 
    Run in Octave.  Opens up a split GUI figure with battlespace on top and
    platoon detection time values along the bottom.  Platoon automatically starts 
