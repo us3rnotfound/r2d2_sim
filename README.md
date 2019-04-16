@@ -11,7 +11,7 @@ Octave script showing platoon maneuvering around Remote Radio Detection Devices 
    number of times the R2D2 (enemy) units spot the platoon.
 
    Modify the following parameters to test different scenarios:
-    - GRID_SIZE (default 1000)
-    - NUM_R2D2  
-    - R2D2_RANGE  (default 5)
-    - MAX_RANGE  (soldier sensor distance of r2d2 detection)
+   - GRID_SIZE (default 1000)
+   - NUM_R2D2  
+   - R2D2_RANGE  (default 5)
+   - MAX_RANGE  (soldier sensor distance of r2d2 detection)
