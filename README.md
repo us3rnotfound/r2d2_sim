@@ -21,7 +21,7 @@ MS Powerpoint presentation detailing the plan to utilize a computer simulation (
    - RD2D_RANGE, <#> (default 5)
    - MAX_RANGE, <#>  (Try 50, soldier sensor distance of r2d2 detection)
    
-### Example Calls:
+### Example Calls (Ran from Octave/Matlab Main Console):
    - r2d2_sim
    - r2d2_sim(GRID_SIZE, 500, NUM_R2D2, 20)
    - r2d2_sim(MAX_RANGE, 50, GRID_SIZE, 1000)
