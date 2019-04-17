@@ -392,7 +392,9 @@ function ret_val = r2d2_sim(varargin)
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
-% Platoon_Move - A function to  
+% Platoon_Move - A function to move the Platoon in a direction (required input
+%                argument string).  It records the last move before exiting the
+%                function. It also keeps the platoon in-bounds.
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
@@ -455,9 +457,20 @@ function ret_val = r2d2_sim(varargin)
       end
 
   end
-  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION:
+% Platoon_Sense - A function to use the sensor that the Platoon has to
+%                 sense R2D2s.  It calls measure and calculation routines that
+%                 convert the sensor data into usable information.
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
   function Platoon_Sense
     % Go through list of r2d2s, calculating Manhatten Distance.
+    % This part of the code is from the know-all computer, which knows every
+    % r2d2.position.  Later it will be filtered by what the sensor actually sees
+    % in Sensor_Measure.
     for i = 1:NUM_R2D2
       raw_offsets{i} = r2d2.positions{i} - platoon.position;
       raw_man_dist{i} = sum(abs(raw_offsets{i}));
@@ -474,8 +487,16 @@ function ret_val = r2d2_sim(varargin)
     % Run Sensor_Calc to calculate severity of measurements and mark the change from last detection.
     Sensor_Calc;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION:
+% Sensor_Measure - A function to actually compare the omniscent computer
+%                  generated offsets with the Platoon's inferior sensor
+%                  (sensor.range is derived from a probability).  It will rack
+%                  up the num_hits and catalog the manhatten distances.
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     function Sensor_Measure
-      %sensor.capability = 0.8; % luck of the draw.
       sensor.capability = .2 + .5*rand; % luck of the draw.
       sensor.range = sensor.capability * MAX_RANGE;
       sensor.old_heatmap = sensor.heatmap;
@@ -495,7 +516,15 @@ function ret_val = r2d2_sim(varargin)
         end
       end  
     end
-    
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION:
+% Sensor_Calc - A function to take the data from the Sensor_Measure routine and
+%               create the heatmap, the information that the Platoon uses in
+%               Platoon_Decide to decide where to maneuver.
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     function Sensor_Calc
       for hit_ctr = 1:sensor.num_hits
         % Find the N/S/E/W direction via the sign.
