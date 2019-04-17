@@ -5,6 +5,7 @@
 % r2d2_sim.m - A simulator to show platoon moving through battlespace with
 % algorithms programmed to dodge R2D2 units.
 %
+%
 % Basic Instructions:
 %   Run in Octave.  Opens up a split GUI figure with battlespace on top and
 %   platoon detection time values along the bottom.  Platoon automatically starts 
@@ -13,22 +14,47 @@
 %   The Count is simply the main loop counter.  The R2D2 Detections count is the
 %   number of times the R2D2 (enemy) units spot the platoon.
 %
-%   Modify the following parameters to test different scenarios:
-%    - GRID_SIZE (default 1000)
-%    - NUM_R2D2  
-%    - R2D2_RANGE  (default 5)
-%    - MAX_RANGE  (soldier sensor distance of r2d2 detection)
+% input arguments:
+%   - GRID_SIZE, <#> (default 1000)
+%   - NUM_R2D2, <#>  (Try 5 - 50)
+%   - RD2D_RANGE, <#> (default 5)
+%   - MAX_RANGE, <#>  (Try 50, soldier sensor distance of r2d2 detection)
+%
+% Example Calls:
+%   r2d2_sim
+%   r2d2_sim('GRID_SIZE', 500, 'NUM_R2D2', 20)
+%   r2d2_sim('MAX_RANGE', 50, 'GRID_SIZE', 1000)
+%   r2d2_sim('GRID_SIZE', 1000, 'NUM_R2D2', 40, 'R2D2_RANGE', 6, 'MAX_RANGE', 20)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function ret_val = r2d2_sim
+function ret_val = r2d2_sim(varargin)
   GRID_SIZE = 1000;
   NUM_R2D2 = 40;
   R2D2_RANGE = 10;
   MAX_RANGE = 40;
+
+  % Parsing input arguments.
+  for i = 1:2:length(varargin)
+    switch upper(varargin{i})
+      case 'GRID_SIZE'
+        GRID_SIZE = varargin{i+1};
+      case 'NUM_R2D2'
+        NUM_R2D2 = varargin{i+1};
+      case 'R2D2_RANGE'
+        R2D2_RANGE = varargin{i+1};
+      case 'MAX_RANGE'
+        MAX_RANGE = varargin{i+1};
+      otherwise
+        msgbox(['Command ', varargin{i}, ' is not recognized. Exiting.']);
+        ret_val = -1;
+        return
+    end
+  end
+  
   % Maneuvering step counts:
-  DIRECTIVE_FORWARD_STEPS = 5;
-  DIRECTIVE_RETRACE_STEPS = 20; 
+  DIRECTIVE_FORWARD_STEPS = GRID_SIZE/50;   % Seems to work the best.
+  DIRECTIVE_RETRACE_STEPS = GRID_SIZE/50;
   
   ret_val = 0;
   
@@ -85,16 +111,25 @@ function ret_val = r2d2_sim
     %disp([platoon.directive{1}, ' ', num2str(platoon.directive{2})]);
     
     %disp([num2str(platoon.move_count), ' ', num2str(platoon.position)]);
-  endwhile
+  end
   
     disp([num2str(platoon.position(1)), ' ', num2str(platoon.position(2))]);
  
  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION:
+% Setup_Plot - A function to create a figure window and display the battlespace 
+%              scatter plot and heatmap spikes.
+%
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
   function Setup_Plot
     for (i = 1:NUM_R2D2)
       splot.xdata(i) = r2d2.positions{i}(1);
       splot.ydata(i) = r2d2.positions{i}(2);
-    endfor
+    end
     % Add the platoon position:
     splot.xdata(NUM_R2D2+1) = platoon.position(1);
     splot.ydata(NUM_R2D2+1) = platoon.position(2);
@@ -116,8 +151,15 @@ function ret_val = r2d2_sim
     splot.r2d2_detections = text(1,3,'R2D2 Detections = 0');
     axis([0 GRID_SIZE*5 0 5]);
     
-  endfunction
-  
+  end
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION:
+% Update_Plot - A function to edit the platoon position, the counter text, the
+%               heatmap indicator, and the R2D2 detection count.
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
   function Update_Plot
     xdata_tmp = get(splot.graph, 'xdata');
     ydata_tmp = get(splot.graph, 'ydata');
@@ -137,8 +179,15 @@ function ret_val = r2d2_sim
     
     drawnow
      
-  endfunction
+  end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION:
+% R2d2_Positions - A function to install the R2D2s on the battlespace as deemed
+%                  by r2d2.raw_positions array.
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
   function R2d2_Positions
     for i=1:NUM_R2D2
       % X position
@@ -150,20 +199,28 @@ function ret_val = r2d2_sim
       %y_pos = 50*i - 5;
       if (y_pos==0)
         y_pos = GRID_SIZE;
-      endif 
+      end 
       
       % Set ordered pair variable.
       r2d2.positions{i} = [x_pos, y_pos]; 
 
-    endfor
-  endfunction
-  
+    end
+  end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION:
+% R2d2_Detection - A function to check if R2D2 detected a platoon in accordance
+%                  with the R2D2_RANGE variable.  It will increment the count
+%                  within the R2D2 structure if it does spot a platoon.
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
   function R2d2_Detection
      % Go through list of r2d2s, calculating Manhatten Distance.
     for i = 1:NUM_R2D2
       raw_offsets{i} = r2d2.positions{i} - platoon.position;
       raw_man_dist{i} = sum(abs(raw_offsets{i}));
-    endfor
+    end
     
     % Reorder from closest to furthest, based on Manhatten Distance:
     [man_dist, sort_order] = sort(cell2mat(raw_man_dist));
@@ -183,11 +240,23 @@ function ret_val = r2d2_sim
           r2d2.num_detections = r2d2.num_detections + 1;
         else
           break; % Keeps getting further away, break.
-        endif
-      endfor  
-    endfunction
-  endfunction
-  
+        end
+      end  
+    end
+  end
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION:
+% Platoon_Decide - A function to process the beginning through the end of the
+%                  platoon's movements. It is very high level. It starts with
+%                  deciding whether it's the first step, if it is, just head
+%                  north. If there's a number >0 of directives in the queue, then
+%                  it calls Platoon_Manuever. Else it checks the sensor's heatmap
+%                  and calls a new directive if it is registering an R2D2.
+%                  Otherwise, a routine movement northeast is all that it calls.
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
   function Platoon_Decide
     if (platoon.move_count == 0)
       Platoon_Move('North');
@@ -225,10 +294,9 @@ function ret_val = r2d2_sim
       %dir_finder(max_chg_dir) = 1;
       
       switch (dir_finder)
-        case [0 0;
+        case [0 0; 
               0 1]
           platoon.directive(1:2)={'NorthWest', DIRECTIVE_FORWARD_STEPS};
-
         case [0 0;
               1 0]
           platoon.directive(1:2)={'NorthEast', DIRECTIVE_FORWARD_STEPS};
@@ -272,14 +340,15 @@ function ret_val = r2d2_sim
         
         case [1 1;
               0 0]
-          platoon.directive(1:2)={'South', DIRECTIVE_FORWARD_STEPS};
+          platoon.directive(1:2)={'South', 2*DIRECTIVE_RETRACE_STEPS};
+          platoon.directive(3:4)={'West', DIRECTIVE_FORWARD_STEPS};
         
         case [1 1;
               0 1]
           platoon.directive(1:2)={'SouthWest', DIRECTIVE_RETRACE_STEPS};
         otherwise
           disp('should not see this');
-      endswitch
+      end
       
       Platoon_Move(platoon.directive{1});
 
@@ -292,9 +361,18 @@ function ret_val = r2d2_sim
         else
           Platoon_Move('North');
          % disp('routine move north.');
-        endif
-      endif
-      
+        end
+      end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION:
+% Platoon_Manuever - A function to handle calling Platoon_Move function from the
+%                    directives queue, which is a multidimensional cell array
+%                    holding the direction to travel and the number of steps to
+%                    take on that direction.
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%      
       % Maneuvering function.
       function Platoon_Manuever
       
@@ -308,11 +386,16 @@ function ret_val = r2d2_sim
           platoon.directive{1} = platoon.directive{3};
           platoon.directive{2} = platoon.directive{4};
           platoon.directive{4} = 0;
-        endif
+        end
       
-      endfunction
-  
-      % Basic moving function.
+    end
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION:
+% Platoon_Move - A function to  
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
       function Platoon_Move(direction)
         direction = upper(direction);
         switch direction
@@ -325,7 +408,7 @@ function ret_val = r2d2_sim
               Platoon_Move('East');
             else
               Platoon_Move('South');
-            endif
+            end
           case 'SOUTH'
             platoon.position(2) = platoon.position(2) - 1;
             platoon.last_move = [0 1 0 0];
@@ -339,7 +422,7 @@ function ret_val = r2d2_sim
               Platoon_Move('North');
             else
               Platoon_Move('South');
-            endif
+            end
           case 'WEST'
             platoon.position(1) = platoon.position(1) - 1;
             platoon.last_move = [0 0 0 1];
@@ -349,36 +432,36 @@ function ret_val = r2d2_sim
               Platoon_Move('East');
             else
               Platoon_Move('North');
-            endif
+            end
           case 'NORTHWEST'
             if (platoon.last_move == [1 0 0 0])
               Platoon_Move('West');
             else
               Platoon_Move('North');
-            endif
+            end
           case 'SOUTHEAST'
             if (platoon.last_move == [0 1 0 0])
               Platoon_Move('East');
             else
               Platoon_Move('South');
-            endif
+            end
           case 'SOUTHWEST'
             if (platoon.last_move == [0 1 0 0])
               Platoon_Move('West');
             else
               Platoon_Move('South');
-            endif
-        endswitch  
-      endfunction
+            end
+        end  
+      end
 
-  endfunction
+  end
   
   function Platoon_Sense
     % Go through list of r2d2s, calculating Manhatten Distance.
     for i = 1:NUM_R2D2
       raw_offsets{i} = r2d2.positions{i} - platoon.position;
       raw_man_dist{i} = sum(abs(raw_offsets{i}));
-    endfor
+    end
     
     % Reorder from closest to furthest, based on Manhatten Distance:
     [man_dist, sort_order] = sort(cell2mat(raw_man_dist));
@@ -409,9 +492,9 @@ function ret_val = r2d2_sim
           sensor.man_dist{r2d2_ctr} = man_dist{r2d2_ctr};
         else
           break; % Keeps getting further away, break.
-        endif
-      endfor  
-    endfunction
+        end
+      end  
+    end
     
     function Sensor_Calc
       for hit_ctr = 1:sensor.num_hits
@@ -420,23 +503,28 @@ function ret_val = r2d2_sim
           x_sign = 1;
         else
           x_sign = -1;
-        endif
+        end
         if (sensor.hits{hit_ctr}(2) > 0)
           y_sign = 1;
         else
           y_sign = -1;
-        endif
+        end
         
         norm_vector = sensor.hits{hit_ctr}/norm(abs(sensor.hits{hit_ctr}));
         
         % If X direction is severe:
-        if (abs(norm_vector(1)/norm_vector(2)) > 5)
-          norm_vector(1) = 1;
-          norm_vector(2) = 0;
-        elseif (abs(norm_vector(2)/norm_vector(1)) > 5)
-          norm_vector(1) = 0;
-          norm_vector(2) = 1;
-        endif
+        if (norm_vector(2) ~= 0)
+          if (abs(norm_vector(1)/norm_vector(2)) > 5)
+            norm_vector(1) = 1;
+            norm_vector(2) = 0;
+          end
+        end
+        if (norm_vector(1) ~= 0)
+          if (abs(norm_vector(2)/norm_vector(1)) > 5)
+            norm_vector(1) = 0;
+            norm_vector(2) = 1;
+          end
+        end
         
         % Gives the strength of the signals:
         x_gauge = norm_vector(1)*x_sign*(1 - abs(sensor.hits{hit_ctr}(1) / sensor.range));
@@ -448,21 +536,21 @@ function ret_val = r2d2_sim
         elseif (x_gauge < 0) % Target is at left.
           sensor.heatmap(1,1) = sensor.heatmap(1,1) - x_gauge;
           sensor.heatmap(2,1) = sensor.heatmap(2,1) - x_gauge;
-        endif
+        end
         if (y_gauge > 0) % Target is above.
           sensor.heatmap(1,1) = sensor.heatmap(1,1) + y_gauge;
           sensor.heatmap(1,2) = sensor.heatmap(1,2) + y_gauge;
         elseif (y_gauge < 0) % Target is below.
           sensor.heatmap(2,1) = sensor.heatmap(2,1) - y_gauge;
           sensor.heatmap(2,2) = sensor.heatmap(2,2) - y_gauge;
-        endif
+        end
         
-      endfor
+      end
       
       % Get the change from last detection:
       sensor.change = sensor.heatmap - sensor.old_heatmap;
       
-    endfunction
-endfunction
+    end
+end
 
-endfunction
+end
