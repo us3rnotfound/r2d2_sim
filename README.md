@@ -14,6 +14,9 @@ MS Powerpoint presentation detailing the plan to utilize a computer simulation (
    In the bottom of the GUI window are the count and the R2D2 Detections count.
    The Count is simply the main loop counter.  The R2D2 Detections count is the
    number of times the R2D2 (enemy) units spot the platoon (hint: this is rare unless you decrease the MAX_RANGE variable).
+  
+   **It is required to have config.txt present in the same directory.**
+   
 
 ### input arguments:
    - 'GRID_SIZE', <#> (default 1000)
