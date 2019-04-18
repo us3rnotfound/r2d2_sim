@@ -199,7 +199,7 @@ function ret_val = r2d2_sim(varargin)
     splot.xdata(NUM_R2D2+1) = platoon.position(1);
     splot.ydata(NUM_R2D2+1) = platoon.position(2);
     
-    f=figure;
+    f=figure('units', 'normalized', 'position', [.2 .2 .6 .6]);
     subplot(2,1,1);
     
     % Start the graph
