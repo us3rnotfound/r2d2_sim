@@ -157,9 +157,10 @@ function ret_val = r2d2_sim(varargin)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
-% Get_Value -  A function to read the configuration from config.txt file, get the
-%              and return the cell array value(s) to the right of the '<key>:'
-%              Returns a cell array of value(s).
+% Get_Value -  A function to read the configuration from config.txt file, get to
+%              the key specified, and return the cell array value(s) to the
+%              right of the '<key>:' label in config.txt. Returns a cell array
+%              of value(s).
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
