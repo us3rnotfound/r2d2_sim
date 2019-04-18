@@ -13,6 +13,7 @@
 %   In the bottom of the GUI window are the count and the R2D2 Detections count.
 %   The Count is simply the main loop counter.  The R2D2 Detections count is the
 %   number of times the R2D2 (enemy) units spot the platoon.
+% It is required to have config.txt present in the same directory.
 %
 % input arguments:
 %   - GRID_SIZE, <#> (default 1000)
@@ -55,6 +56,10 @@ function ret_val = r2d2_sim(varargin)
   % Maneuvering step counts:
   DIRECTIVE_FORWARD_STEPS = GRID_SIZE/50;   % Seems to work the best.
   DIRECTIVE_RETRACE_STEPS = GRID_SIZE/50;
+  
+  config_file_contents = [];
+  
+  Read_Config_File;
   
   ret_val = 0;
   
@@ -115,6 +120,66 @@ function ret_val = r2d2_sim(varargin)
   
     disp([num2str(platoon.position(1)), ' ', num2str(platoon.position(2))]);
  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION:
+% Read_Config_File - A function to read the config.txt file into a persistent 
+%                    cell array called config_file_contents.
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  function read_success = Read_Config_File
+    read_success = 0;
+    i = 1;
+    fileID = fopen('config.txt');
+    while ~feof(fileID)
+      f_line = strtrim(fgetl(fileID));
+      if length(f_line)
+        % needs to have a : to denote key:value pair, or drop it.
+        if strfind(f_line,':')  
+          % Remove comments.
+          k = min(strfind(f_line, '//'));  % min: find the first occurance.
+          if k == 1
+            % don't include, the whole line contains a comment.
+          elseif k > 1
+            % Partially-commented. Key-value pair.
+            config_file_contents{i} = strsplit(f_line(1:k-1),':');
+            i = i + 1;
+          else  % include whole line. Key-value pair.
+            config_file_contents{i} = strsplit(f_line,':');
+            i = i + 1;
+          end
+        end
+      end
+    end
+    fclose(fileID);
+    
+  end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FUNCTION:
+% Get_Value -  A function to read the configuration from config.txt file, get the
+%              and return the cell array value(s) to the right of the '<key>:'
+%              Returns a cell array of value(s).
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+  function value = Get_Value(key)
+    % Search for key
+    if length(config_file_contents)
+      for i=1:length(config_file_contents)
+        if strfind(config_file_contents{i}{1}, key)
+          % found the key, now take the values and break loop.
+          value = strtrim(strsplit(config_file_contents{i}{2},','));  % split up by ',' delimeter.
+          % Deletes white-space.
+          break;
+        end
+      end
+    else  
+      msgbox('Unsucessful read of config.txt');
+      return
+    end
+  end
+  
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
@@ -124,7 +189,6 @@ function ret_val = r2d2_sim(varargin)
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
   function Setup_Plot
     for (i = 1:NUM_R2D2)
       splot.xdata(i) = r2d2.positions{i}(1);
@@ -293,63 +357,24 @@ function ret_val = r2d2_sim(varargin)
       disp(dir_finder)
       %dir_finder(max_chg_dir) = 1;
       
-      switch (dir_finder)
-        case [0 0; 
-              0 1]
-          platoon.directive(1:2)={'NorthWest', DIRECTIVE_FORWARD_STEPS};
-        case [0 0;
-              1 0]
-          platoon.directive(1:2)={'NorthEast', DIRECTIVE_FORWARD_STEPS};
-        
-        case [0 0;
-              1 1]
-          platoon.directive(1:2)={'North', DIRECTIVE_FORWARD_STEPS};
-       
-        case [0 1;
-              0 0]
-          platoon.directive(1:2)={'South', DIRECTIVE_RETRACE_STEPS};
-          platoon.directive(3:4)={'East', DIRECTIVE_RETRACE_STEPS};
-
-        case [0 1;
-              0 1]
-          platoon.directive(1:2)={'NorthWest', DIRECTIVE_RETRACE_STEPS};
-          platoon.directive(1:2)={'East', DIRECTIVE_RETRACE_STEPS};
-        case [0 1;
-              1 0]
-          platoon.directive(1:2)={'SouthEast', DIRECTIVE_FORWARD_STEPS};
-        
-        case [0 1;
-              1 1]
-          platoon.directive(1:2)={'NorthWest', DIRECTIVE_FORWARD_STEPS};
-        
-        case [1 0;
-              0 0]
-          platoon.directive(1:2)={'SouthEast', DIRECTIVE_FORWARD_STEPS};
-        
-        case [1 0;
-              0 1]
-          platoon.directive(1:2)={'NorthEast', DIRECTIVE_FORWARD_STEPS};
-        
-        case [1 0;
-              1 0]
-          platoon.directive(1:2)={'East', DIRECTIVE_FORWARD_STEPS};
-        
-        case [1 0;
-              1 1]
-          platoon.directive(1:2)={'NorthEast', DIRECTIVE_FORWARD_STEPS};
-        
-        case [1 1;
-              0 0]
-          platoon.directive(1:2)={'South', 2*DIRECTIVE_RETRACE_STEPS};
-          platoon.directive(3:4)={'West', DIRECTIVE_FORWARD_STEPS};
-        
-        case [1 1;
-              0 1]
-          platoon.directive(1:2)={'SouthWest', DIRECTIVE_RETRACE_STEPS};
-        otherwise
-          disp('should not see this');
+      % Form a string that Get_Value function can read.
+      % e.g., turns [0 1;0 0] into '[0 1;0 0'
+      dir_finder_str = ['[',num2str(dir_finder(1)),' ',num2str(dir_finder(3)),...
+                        ';',num2str(dir_finder(2)),' ',num2str(dir_finder(4)),...
+                        ']'];
+      
+      % Get the directives from the config.txt file.
+      directives = Get_Value(dir_finder_str);
+      % Assign the directives as deemed from config.txt.
+      if (length(directives) == 2)
+        platoon.directive(1:2) = {directives{1}, str2double(directives{2})};
+      elseif (length(directives) == 4)
+        platoon.directive(1:2) = {directives{1}, str2double(directives{2})};
+        platoon.directive(3:4) = {directives{3}, str2double(directives{4})};
       end
       
+      % Starts the move. The next loop around, this will not run because there
+      % will be queued up directives.    
       Platoon_Move(platoon.directive{1});
 
       % Just a routine move north or east to reach the finish line.

@@ -1,52 +1,16 @@
-case [0 0; 
-              0 1]
-          platoon.directive(1:2)={'NorthWest', DIRECTIVE_FORWARD_STEPS};
-        case [0 0;
-              1 0]
-          platoon.directive(1:2)={'NorthEast', DIRECTIVE_FORWARD_STEPS};
-        
-        case [0 0;
-              1 1]
-          platoon.directive(1:2)={'North', DIRECTIVE_FORWARD_STEPS};
-       
-        case [0 1;
-              0 0]
-          platoon.directive(1:2)={'South', DIRECTIVE_RETRACE_STEPS};
-          platoon.directive(3:4)={'East', DIRECTIVE_RETRACE_STEPS};
+// Config.txt: shows a listing of the corresponding heatmap maneuvers.
+// This is a comment (starts with //).
 
-        case [0 1;
-              0 1]
-          platoon.directive(1:2)={'NorthWest', DIRECTIVE_RETRACE_STEPS};
-          platoon.directive(1:2)={'East', DIRECTIVE_RETRACE_STEPS};
-        case [0 1;
-              1 0]
-          platoon.directive(1:2)={'SouthEast', DIRECTIVE_FORWARD_STEPS};
-        
-        case [0 1;
-              1 1]
-          platoon.directive(1:2)={'NorthWest', DIRECTIVE_FORWARD_STEPS};
-        
-        case [1 0;
-              0 0]
-          platoon.directive(1:2)={'SouthEast', DIRECTIVE_FORWARD_STEPS};
-        
-        case [1 0;
-              0 1]
-          platoon.directive(1:2)={'NorthEast', DIRECTIVE_FORWARD_STEPS};
-        
-        case [1 0;
-              1 0]
-          platoon.directive(1:2)={'East', DIRECTIVE_FORWARD_STEPS};
-        
-        case [1 0;
-              1 1]
-          platoon.directive(1:2)={'NorthEast', DIRECTIVE_FORWARD_STEPS};
-        
-        case [1 1;
-              0 0]
-          platoon.directive(1:2)={'South', 2*DIRECTIVE_RETRACE_STEPS};
-          platoon.directive(3:4)={'West', DIRECTIVE_FORWARD_STEPS};
-        
-        case [1 1;
-              0 1]
-          platoon.directive(1:2)={'SouthWest', DIRECTIVE_RETRACE_STEPS};
+[0 0;0 1]:  NorthWest, 20  // most common.
+[0 0;1 0]:  NorthEast, 20
+[0 0;1 1]:  North, 20
+[0 1;0 0]:  South, 20,East,20
+[0 1;0 1]:  NorthWest, 20, East,20
+[0 1;1 0]:  SouthEast, 20
+[0 1;1 1]:  NorthWest, 20
+[1 0;0 0]:  SouthEast, 20
+[1 0;0 1]:  NorthEast, 20
+[1 0;1 0]:  East, 20
+[1 0;1 1]:  NorthEast, 20
+[1 1;0 0]:  South, 30,West, 20
+[1 1;0 1]:  SouthWest, 20
