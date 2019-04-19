@@ -122,7 +122,7 @@ function ret_val = r2d2_sim(varargin)
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
-% Read_Config_File - A function to read the config.txt file into a persistent 
+% Read_Config_File - A function to read the config.txt file into a 
 %                    cell array called config_file_contents.
 %
 %
@@ -408,7 +408,6 @@ function ret_val = r2d2_sim(varargin)
         
         % When the first row of directives is exhausted, move second row up.
         if (platoon.directive{2} == 0 && platoon.directive{4}>0)
-          disp('Changing Directives');
           platoon.directive{1} = platoon.directive{3};
           platoon.directive{2} = platoon.directive{4};
           platoon.directive{4} = 0;

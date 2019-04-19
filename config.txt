@@ -1,7 +1,13 @@
 // Config.txt: shows a listing of the corresponding heatmap maneuvers.
 // This is a comment (starts with //).
 
-[0 0;0 1]:  NorthWest, 20  
+// Defined in following way:
+// <R2D2 Direction>: 1st direction to move, 1st # steps, (optional) 2nd direction to move, 2nd # steps
+// R2D2 Direction: [NW NE;SW SE] == NW  NE
+//                                  SW  SE   <-- 2 x 2 array with 0s and 1s, 0s meaning not there and 1s meaning lookout.
+// Platoon direction options (case insensitive):  North, South, East, West, Northwest, Northeast, Southwest, Southeast.
+
+[0 0;0 1]:  NorthWest, 20   // r2d2 detected southeast...move northwest 20 steps.
 [0 0;1 0]:  NorthEast, 20
 [0 0;1 1]:  North, 20
 [0 1;0 0]:  South, 20,East,20  // most common.
