@@ -3,6 +3,9 @@
 ### r2d2_sim.m
 Octave script showing platoon maneuvering around Remote Radio Detection Devices (R2D2s) from (0,0) to the maximal (x,y) point.
 
+### config.txt
+Required configuration file to be in same directory as r2d2_sim.m.  It defines platoon movement for each of the possible sensor "heatmap" scenarios.
+
 ### jyn_prompt2_battlespace.pptx
 MS Powerpoint presentation detailing the plan to utilize a computer simulation (r2d2_sim.m) to simulate the maneuvering of Platoon through battlespace to avoid detection from the R2D2s.
 
