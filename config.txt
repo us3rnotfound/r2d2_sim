@@ -1,10 +1,10 @@
 // Config.txt: shows a listing of the corresponding heatmap maneuvers.
 // This is a comment (starts with //).
 
-[0 0;0 1]:  NorthWest, 20  // most common.
+[0 0;0 1]:  NorthWest, 20  
 [0 0;1 0]:  NorthEast, 20
 [0 0;1 1]:  North, 20
-[0 1;0 0]:  South, 20,East,20
+[0 1;0 0]:  South, 20,East,20  // most common.
 [0 1;0 1]:  NorthWest, 20, East,20
 [0 1;1 0]:  SouthEast, 20
 [0 1;1 1]:  NorthWest, 20
