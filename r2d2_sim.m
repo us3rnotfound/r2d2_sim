@@ -155,7 +155,7 @@ function ret_val = r2d2_sim(varargin)
     end
     fclose(fileID);
     
-  end
+  end % Read_Config_File
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
@@ -181,7 +181,7 @@ function ret_val = r2d2_sim(varargin)
       msgbox('Unsucessful read of config.txt');
       return
     end
-  end
+  end % Get_Value
   
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -218,7 +218,7 @@ function ret_val = r2d2_sim(varargin)
     splot.r2d2_detections = text(1,3,'R2D2 Detections = 0');
     axis([0 GRID_SIZE*5 0 5]);
     
-  end
+  end % Setup_Plot
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
@@ -246,7 +246,7 @@ function ret_val = r2d2_sim(varargin)
     
     drawnow
      
-  end
+  end % Update_Plot
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
@@ -272,7 +272,7 @@ function ret_val = r2d2_sim(varargin)
       r2d2.positions{i} = [x_pos, y_pos]; 
 
     end
-  end
+  end % R2d2_Positions
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
@@ -312,7 +312,7 @@ function ret_val = r2d2_sim(varargin)
         end
       end  
     end
-  end
+  end % R2D2_Detection
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
@@ -416,10 +416,8 @@ function ret_val = r2d2_sim(varargin)
           platoon.directive{2} = platoon.directive{4};
           platoon.directive{4} = 0;
         end
-      end
+      end % Platoon_Maneuver
       
-    
-    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
 % Platoon_Move - A function to move the Platoon in a direction (required input
@@ -484,9 +482,8 @@ function ret_val = r2d2_sim(varargin)
               Platoon_Move('South');
             end
         end  
-      end
-
-  end
+      end % Platoon_Move
+  end % Platoon_Decide
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
@@ -548,7 +545,7 @@ function ret_val = r2d2_sim(varargin)
           break; % Keeps getting further away, break.
         end
       end  
-    end
+    end % Sensor_Measure
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
@@ -612,7 +609,6 @@ function ret_val = r2d2_sim(varargin)
       % Get the change from last detection:
       sensor.change = sensor.heatmap - sensor.old_heatmap;
       
-    end
-end
-
-end
+    end % Sensor_Calc
+  end % Platoon_Sense
+end % R2D2_Sim
