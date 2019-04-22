@@ -7,7 +7,7 @@
 %
 %
 % Basic Instructions:
-%   Run in Octave.  Opens up a split GUI figure with battlespace on top and
+%   Run in Matlab/Octave.  Opens up a split GUI figure with battlespace on top and
 %   platoon detection time values along the bottom.  Platoon automatically starts 
 %   from (1,1), and goes until it finishes at (1000,1000).
 %   In the bottom of the GUI window are the count and the R2D2 Detections count.
@@ -27,13 +27,16 @@
 %   r2d2_sim('MAX_RANGE', 50, 'GRID_SIZE', 1000)
 %   r2d2_sim('GRID_SIZE', 1000, 'NUM_R2D2', 40, 'R2D2_RANGE', 6, 'MAX_RANGE', 20)
 %
+%  22 April 2019
+%   - Tested and works in Matlab with a small change to the
+%   platoon.directive cell array.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function ret_val = r2d2_sim(varargin)
   GRID_SIZE = 1000;
   NUM_R2D2 = 40;
   R2D2_RANGE = 10;
-  MAX_RANGE = 40;
+  MAX_RANGE = 50;
 
   % Parsing input arguments.
   for i = 1:2:length(varargin)
@@ -78,8 +81,7 @@ function ret_val = r2d2_sim(varargin)
 
   % Place platoon at the starting mark.
   platoon.position = [1,1];
-  platoon.directive = {'N/A', 0;
-                       'N/A', 0;};
+  platoon.directive = {'N/A', 0,'N/A', 0};
   platoon.last_move = [0 0 0 0]; % n s e w.
   platoon.move_count = 0;
   platoon.detections = zeros(DIRECTIVE_FORWARD_STEPS, 1);
@@ -281,6 +283,8 @@ function ret_val = r2d2_sim(varargin)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   
   function R2d2_Detection
+    raw_offsets = cell(NUM_R2D2);
+    raw_man_dist = cell(NUM_R2D2);
      % Go through list of r2d2s, calculating Manhatten Distance.
     for i = 1:NUM_R2D2
       raw_offsets{i} = r2d2.positions{i} - platoon.position;
@@ -329,7 +333,7 @@ function ret_val = r2d2_sim(varargin)
     elseif (platoon.directive{2}>0)
       
       % Call the directives.
-      Platoon_Manuever
+      Platoon_Manuever;
 
   % Heatmap analysis.
   
@@ -379,7 +383,7 @@ function ret_val = r2d2_sim(varargin)
       Platoon_Move(platoon.directive{1});
 
       % Just a routine move north or east to reach the finish line.
-      else
+    else
         if platoon.last_move(1)
           Platoon_Move('East');
          % disp('routine move east.');
@@ -388,7 +392,7 @@ function ret_val = r2d2_sim(varargin)
           Platoon_Move('North');
          % disp('routine move north.');
         end
-      end
+    end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
@@ -412,8 +416,9 @@ function ret_val = r2d2_sim(varargin)
           platoon.directive{2} = platoon.directive{4};
           platoon.directive{4} = 0;
         end
+      end
       
-    end
+    
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FUNCTION:
@@ -496,6 +501,9 @@ function ret_val = r2d2_sim(varargin)
     % This part of the code is from the know-all computer, which knows every
     % r2d2.position.  Later it will be filtered by what the sensor actually sees
     % in Sensor_Measure.
+    raw_offsets = cell(NUM_R2D2);
+    raw_man_dist = cell(NUM_R2D2);
+    
     for i = 1:NUM_R2D2
       raw_offsets{i} = r2d2.positions{i} - platoon.position;
       raw_man_dist{i} = sum(abs(raw_offsets{i}));
