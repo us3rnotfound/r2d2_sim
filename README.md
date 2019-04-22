@@ -1,7 +1,7 @@
 # Deliverables:
 
 ### r2d2_sim.m
-Octave script showing platoon maneuvering around Remote Radio Detection Devices (R2D2s) from (0,0) to the maximal (x,y) point.
+Matlab/Octave script showing platoon maneuvering around Remote Radio Detection Devices (R2D2s) from (0,0) to the maximal (x,y) point.
 
 ### config.txt
 Required configuration file to be in same directory as r2d2_sim.m.  It defines platoon movement for each of the possible sensor "heatmap" scenarios.
@@ -11,7 +11,7 @@ MS Powerpoint presentation detailing the plan to utilize a computer simulation (
 
 # r2d2_sim.m Basic Instructions:
 
-   Run in Octave.  It should work in Matlab, no special functions are used, but beware this is untested in Matlab. 
+   Run in Octave or Matlab.  I changed the way the platoon.directive cell array was setup to make it compatible with Matlab.
    It opens up a split GUI figure with battlespace on top and platoon detection time values along the bottom.
    Platoon automatically starts from (1,1), and goes until it finishes at (1000,1000).
    In the bottom of the GUI window are the count and the R2D2 Detections count.
